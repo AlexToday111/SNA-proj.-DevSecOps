@@ -75,7 +75,7 @@ The project responsibilities are distributed across the team according to the ma
 | Ernest Kudakaev | Documentation and CI/CD pipeline design |
 | Zakhar Bolshakov | Backend development with Go/Golang |
 | Nikita Khripunkov | Backend development with Go/Golang |
-| Maria Chagodaeva | Design and frontend development |
+| Maria Chegodaeva | Design and frontend development |
 
 <h2 align="center">Technology Stack</h2>
 
