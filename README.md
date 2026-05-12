@@ -57,7 +57,28 @@ flowchart TD
 ├── assets/
 │   └── DevSecOps.png
 ├── frontend/
-│   └── README.md
+│   ├── README.md
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   ├── index.html
+│   └── src/
+│       ├── main.jsx
+│       ├── App.jsx
+│       ├── index.css
+│       ├── assets/
+│       │   └── project-logo.png
+│       ├── data/
+│       │   └── scenarios.js    # Static data for three demonstration flows
+│       └── components/
+│           ├── Header.jsx
+│           ├── ScenarioSelector.jsx
+│           ├── PipelineFlow.jsx
+│           ├── ScanResults.jsx
+│           ├── EventLogs.jsx
+│           └── Icons.jsx
 ├── backend/
 │   └── README.md
 └── docs/
@@ -75,7 +96,7 @@ The project responsibilities are distributed across the team according to the ma
 | Ernest Kudakaev | Documentation and CI/CD pipeline design |
 | Zakhar Bolshakov | Backend development with Go/Golang |
 | Nikita Khripunkov | Backend development with Go/Golang |
-| Maria Chegodaeva | Design and frontend development |
+| Mariia Chegodaeva | Design and frontend development |
 
 <h2 align="center">Technology Stack</h2>
 
@@ -83,6 +104,7 @@ The project design is based on the following technologies and security tools:
 
 - GitHub Actions for CI/CD automation
 - Docker for application containerization
+- React 18 and Vite 5 for the frontend pipeline dashboard
 - Go/Golang for the backend application component
 - Semgrep or Bandit for Static Application Security Testing
 - Trivy for container image vulnerability scanning
