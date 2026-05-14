@@ -1,0 +1,50 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "Pipeline scenario to demonstrate"
+        required: true
+        default: safe
+        type: choice
+        options:
+          - safe
+          - unsafe
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  safe-backend-ci:
+    name: Safe backend tests and vet
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/safe/go.mod
+          cache: false
+
+      - name: Install safe backend dependencies
+        working-directory: backend/safe
+        run: go mod download
+
+      - name: Run safe backend tests
+        working-directory: backend/safe
+        run: go test ./...
+
+      - name: Run go vet
+        working-directory: backend/safe
+        run: go vet ./...
