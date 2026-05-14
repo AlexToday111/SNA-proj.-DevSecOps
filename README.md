@@ -80,12 +80,22 @@ flowchart TD
 │           ├── EventLogs.jsx
 │           └── Icons.jsx
 ├── backend/
-│   └── README.md
+│   ├── README.md
+│   ├── safe/
+│   │   ├── go.mod
+│   │   ├── main.go
+│   │   ├── main_test.go
+│   │   ├── Dockerfile
+│   │   └── .dockerignore
+│   └── unsafe/
+│       ├── go.mod
+│       ├── go.sum
+│       └── main.go
 └── docs/
     └── README.md
 ```
 
-The `assets` directory is reserved for project visual materials, including the `DevSecOps.png` logo referenced at the top of this README. The `frontend` directory is reserved for a simple user-facing interface or static demonstration page. The `backend` directory is reserved for the main application component that can be containerized and analyzed by the security pipeline. The `docs` directory contains supporting documentation for architecture, pipeline design, security decisions, demonstration scenarios, and results.
+The `assets` directory is reserved for project visual materials, including the `DevSecOps.png` logo referenced at the top of this README. The `frontend` directory contains the interactive pipeline dashboard used for presentation. The `backend` directory contains two Go service variants: `safe` for the successful pipeline path and `unsafe` for the SAST blocking scenario. The `docs` directory contains supporting documentation for architecture, pipeline design, security decisions, demonstration scenarios, and results.
 
 <h2 align="center">Team Roles</h2>
 

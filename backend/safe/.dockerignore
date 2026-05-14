@@ -1,0 +1,6 @@
+.git
+.github
+Dockerfile
+*.test
+tmp/
+dist/
