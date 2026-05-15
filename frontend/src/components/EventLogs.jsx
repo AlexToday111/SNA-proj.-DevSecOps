@@ -11,7 +11,7 @@ export default function EventLogs({ logs, totalLogs, isAnimating }) {
             <span>Pipeline Events</span>
             {isAnimating && (
               <span style={{ fontSize: '11px', color: 'var(--blue)', fontWeight: 400 }}>
-                — streaming…
+                - streaming...
               </span>
             )}
           </div>
@@ -26,10 +26,10 @@ export default function EventLogs({ logs, totalLogs, isAnimating }) {
             </div>
           ))}
           {isAnimating && logs.length < totalLogs && (
-            <div className="log-row log-cursor-row">
-              <span className="log-time">──────</span>
+            <div className="log-row log-pending-row">
+              <span className="log-time">------</span>
               <span className="log-level INFO">[INFO]</span>
-              <span className="log-message log-cursor">▌</span>
+              <span className="log-message">Waiting for next pipeline event...</span>
             </div>
           )}
         </div>

@@ -1,15 +1,15 @@
 import { StepIcon } from './Icons.jsx'
 
 const STATUS_ICON = {
-  success: '✓',
-  failed:  '✗',
-  pending: '●',
-  skipped: '–',
-  blocked: '◌',
+  success: 'OK',
+  failed: 'X',
+  pending: '...',
+  skipped: '-',
+  blocked: '!',
 }
 
 function PipelineStep({ step }) {
-  const icon = STATUS_ICON[step.status] ?? '●'
+  const icon = STATUS_ICON[step.status] ?? '...'
   return (
     <div className="pipeline-step">
       <div className={`step-box ${step.status}`}>
@@ -35,7 +35,7 @@ export default function PipelineFlow({ steps }) {
               <div key={step.id} style={{ display: 'flex', alignItems: 'center' }}>
                 {idx > 0 && (
                   <div className={`pipeline-arrow ${prevSuccess && step.status === 'success' ? 'active' : ''}`}>
-                    →
+                    -&gt;
                   </div>
                 )}
                 <PipelineStep step={step} />

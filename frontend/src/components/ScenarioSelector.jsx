@@ -2,14 +2,14 @@ export default function ScenarioSelector({ scenarios, activeId, onSelect, isAnim
   return (
     <div>
       <div className="section-header">
-        <p className="section-title" style={{ margin: 0 }}>Demo Scenarios — select to run</p>
+        <p className="section-title" style={{ margin: 0 }}>Demo Scenarios - select to run</p>
         <button
           className={`replay-btn ${isAnimating ? 'disabled' : ''}`}
           onClick={onReplay}
           disabled={isAnimating}
           title="Replay current scenario"
         >
-          {isAnimating ? '⏳ Running…' : '▶ Replay'}
+          {isAnimating ? 'Running...' : 'Replay'}
         </button>
       </div>
       <div className="scenario-selector">

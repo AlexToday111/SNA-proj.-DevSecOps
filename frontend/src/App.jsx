@@ -5,6 +5,7 @@ import ScenarioSelector from './components/ScenarioSelector.jsx'
 import PipelineFlow from './components/PipelineFlow.jsx'
 import ScanResults from './components/ScanResults.jsx'
 import EventLogs from './components/EventLogs.jsx'
+import BackendPanel from './components/BackendPanel.jsx'
 import { BlockIcon, CheckIcon } from './components/Icons.jsx'
 
 const STEP_DELAY_MS = 600
@@ -86,6 +87,8 @@ export default function App() {
         )}
 
         <PipelineFlow steps={animatedSteps} />
+
+        <BackendPanel />
 
         <ScanResults
           sast={activeScenario.sast}

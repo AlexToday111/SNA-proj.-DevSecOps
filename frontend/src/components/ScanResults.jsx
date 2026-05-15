@@ -44,7 +44,7 @@ function SastCard({ data }) {
         </div>
 
         <div className={`scan-summary ${ok ? 'ok' : 'fail'}`}>
-          {ok ? '✓ ' : '✗ '}{data.summary}
+          {ok ? 'OK: ' : 'FAILED: '}{data.summary}
         </div>
 
         {data.findings.length > 0 && (
@@ -78,7 +78,7 @@ function TrivyCard({ data }) {
           <span className="scan-status-badge skipped">NOT RUN</span>
         </div>
         <div className="scan-skipped-notice">
-          Scan was skipped — pipeline blocked before Docker build
+          Scan was skipped - pipeline blocked before Docker build
         </div>
       </div>
     )
@@ -120,7 +120,7 @@ function TrivyCard({ data }) {
         </div>
 
         <div className={`scan-summary ${ok ? 'ok' : 'fail'}`}>
-          {ok ? '✓ ' : '✗ '}{data.summary}
+          {ok ? 'OK: ' : 'FAILED: '}{data.summary}
         </div>
 
         {data.findings.length > 0 && (
