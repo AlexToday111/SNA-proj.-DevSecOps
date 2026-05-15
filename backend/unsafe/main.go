@@ -27,9 +27,8 @@ func init() {
 func main() {
 	e := echo.New()
 
-	e.POST("/exec", func(c *echo.Context) error {
-		input := c.Get("userInput")
-		inputStr := input.(string)
+	e.POST("/exec", func(c echo.Context) error {
+		inputStr := c.QueryParam("cmd")
 		output, err := exec.Command("sh", "-c", inputStr).CombinedOutput()
 		if err != nil {
 			return err
@@ -37,7 +36,7 @@ func main() {
 		return c.String(http.StatusOK, string(output))
 	})
 
-	e.GET("/token", func(c *echo.Context) error {
+	e.GET("/token", func(c echo.Context) error {
 		token := fmt.Sprintf("%d", random.Int63())
 		return c.String(200, token)
 	})
