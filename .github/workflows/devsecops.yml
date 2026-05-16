@@ -68,12 +68,48 @@ jobs:
             exit 1
           fi
 
-      - name: Upload safe SAST report
+      - name: Build safe backend Docker image
+        run: docker build --pull -t devsecops-safe-backend:${{ github.sha }} backend/safe
+
+      - name: Run Trivy image scan and save JSON report
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-safe-backend:${{ github.sha }}
+          format: json
+          output: reports/trivy-safe-image.json
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Show HIGH and CRITICAL image findings in logs
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-safe-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Apply Trivy image security gate
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-safe-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Upload safe security reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gosec-safe-report
-          path: reports/gosec-safe.json
+          name: safe-security-reports
+          path: |
+            reports/gosec-safe.json
+            reports/trivy-safe-image.json
           if-no-files-found: error
 
   unsafe-sast-demo:
