@@ -108,7 +108,11 @@ func (a app) handleToken(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (a app) handleEcho(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Printf("failed to close request body: %v", err)
+		}
+	}()
 
 	limitedBody := http.MaxBytesReader(w, r.Body, maxEchoBytes)
 	decoder := json.NewDecoder(limitedBody)

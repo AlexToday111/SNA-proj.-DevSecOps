@@ -1,0 +1,170 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "Pipeline scenario to demonstrate"
+        required: true
+        default: safe
+        type: choice
+        options:
+          - safe
+          - unsafe
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  safe-backend-ci:
+    name: Safe backend CI and SAST gate
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.scenario != 'unsafe' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/safe/go.mod
+          cache: false
+
+      - name: Install safe backend dependencies
+        working-directory: backend/safe
+        run: go mod download
+
+      - name: Run safe backend tests
+        working-directory: backend/safe
+        run: go test ./...
+
+      - name: Run go vet
+        working-directory: backend/safe
+        run: go vet ./...
+
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Run gosec SAST on safe backend
+        working-directory: backend/safe
+        run: |
+          mkdir -p ../../reports
+          gosec -fmt=json -out=../../reports/gosec-safe.json ./... || true
+          test -s ../../reports/gosec-safe.json
+          cat ../../reports/gosec-safe.json
+
+          issue_count="$(jq '.Issues | length' ../../reports/gosec-safe.json)"
+          echo "Safe backend gosec findings: ${issue_count}"
+          if [ "${issue_count}" -gt 0 ]; then
+            echo "Security gate failed: safe backend must not contain gosec findings."
+            exit 1
+          fi
+
+      - name: Build safe backend Docker image
+        run: docker build --pull -t devsecops-safe-backend:${{ github.sha }} backend/safe
+
+      - name: Run Trivy image scan and save JSON report
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-safe-backend:${{ github.sha }}
+          format: json
+          output: reports/trivy-safe-image.json
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Show HIGH and CRITICAL image findings in logs
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-safe-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Apply Trivy image security gate
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: devsecops-safe-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Upload safe security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: safe-security-reports
+          path: |
+            reports/gosec-safe.json
+            reports/trivy-safe-image.json
+          if-no-files-found: error
+
+  unsafe-sast-demo:
+    name: Unsafe backend SAST demonstration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/unsafe/go.mod
+          cache: false
+
+      - name: Install unsafe backend dependencies
+        working-directory: backend/unsafe
+        run: go mod download
+
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Run gosec SAST on intentionally unsafe backend
+        working-directory: backend/unsafe
+        run: |
+          mkdir -p ../../reports
+          gosec -fmt=json -out=../../reports/gosec-unsafe.json ./... || true
+          test -s ../../reports/gosec-unsafe.json
+          cat ../../reports/gosec-unsafe.json
+
+          issue_count="$(jq '.Issues | length' ../../reports/gosec-unsafe.json)"
+          echo "Unsafe backend gosec findings: ${issue_count}"
+          if [ "${issue_count}" -eq 0 ]; then
+            echo "Expected unsafe backend findings, but gosec did not report any."
+            exit 1
+          fi
+
+      - name: Apply unsafe scenario security gate
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.scenario == 'unsafe' || inputs.scenario == 'all') }}
+        run: |
+          echo "Security gate failed intentionally for the unsafe demonstration scenario."
+          echo "backend/unsafe is preserved to show how CI blocks vulnerable code."
+          exit 1
+
+      - name: Explain non-blocking unsafe scan on normal CI
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.scenario == 'safe' }}
+        run: |
+          echo "Unsafe SAST findings were recorded for education."
+          echo "Normal push and pull request runs keep the safe delivery path usable."
+
+      - name: Upload unsafe SAST report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gosec-unsafe-report
+          path: reports/gosec-unsafe.json
+          if-no-files-found: error
