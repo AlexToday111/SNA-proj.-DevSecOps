@@ -2,140 +2,133 @@
   <img src="assets/DevSecOps.png" alt="DevSecOps project logo" width="180">
 </p>
 
-<h1 align="center">Secure DevOps Pipeline for Containerized Application</h1>
+# Secure DevOps Pipeline for Containerized Application
 
-<h2 align="center">Overview</h2>
+This repository is a university DevSecOps project that demonstrates how security checks can be added directly to a CI/CD workflow for a containerized application. The project keeps two backend examples:
 
-This repository is structured to support a university DevSecOps project focused on building a secure CI/CD pipeline for a containerized web application. The project design integrates security validation into the software delivery process so that source code, dependencies, and container images can be assessed before deployment decisions are made.
+- `backend/safe` is the secure Go service used for the passing delivery path.
+- `backend/unsafe` is intentionally vulnerable and exists only to demonstrate SAST detection and a failed security gate.
 
-<h2 align="center">Objective</h2>
+The project is designed for a live presentation: a developer pushes code, GitHub Actions runs tests and security scans, reports are exported as artifacts, and the monitoring stack can ingest those reports for review in Kibana.
 
-The objective is to demonstrate how vulnerable source code or insecure container images can be automatically detected and blocked before delivery. The repository provides a clear project foundation for showing how security controls can be embedded into a DevOps workflow without separating security from development and operations activities.
-
-<h2 align="center">DevSecOps Concept</h2>
-
-DevSecOps extends DevOps by integrating security practices directly into development, testing, build, and delivery processes. In a CI/CD pipeline, this means that security checks are executed automatically when changes are introduced, allowing insecure code patterns, vulnerable dependencies, and unsafe container images to be identified early.
-
-<h2 align="center">High-Level Architecture</h2>
-
-```text
-Developer
-  |
-  v
-GitHub Repository
-  |
-  v
-GitHub Actions Pipeline
-  |
-  |-- Source Code Security Analysis
-  |-- Container Image Build
-  |-- Container Vulnerability Scan
-  |-- Security Gate
-  |
-  v
-Logging / Monitoring
-```
-
-```mermaid
-flowchart TD
-    Developer[Developer] --> Repository[GitHub Repository]
-    Repository --> Pipeline[GitHub Actions Pipeline]
-    Pipeline --> SAST[Source Code Security Analysis]
-    Pipeline --> Build[Container Image Build]
-    Pipeline --> Scan[Container Vulnerability Scan]
-    SAST --> Gate[Security Gate]
-    Build --> Scan
-    Scan --> Gate
-    Gate --> Monitoring[Logging / Monitoring]
-```
-
-<h2 align="center">Repository Structure</h2>
-
-```text
-.
-├── README.md
-├── assets/
-│   └── DevSecOps.png
-├── frontend/
-│   ├── README.md
-│   ├── Dockerfile
-│   ├── .dockerignore
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── vite.config.js
-│   ├── index.html
-│   └── src/
-│       ├── main.jsx
-│       ├── App.jsx
-│       ├── index.css
-│       ├── assets/
-│       │   └── project-logo.png
-│       ├── data/
-│       │   └── scenarios.js    # Static data for three demonstration flows
-│       └── components/
-│           ├── Header.jsx
-│           ├── ScenarioSelector.jsx
-│           ├── PipelineFlow.jsx
-│           ├── ScanResults.jsx
-│           ├── EventLogs.jsx
-│           └── Icons.jsx
-├── backend/
-│   ├── README.md
-│   ├── safe/
-│   │   ├── go.mod
-│   │   ├── main.go
-│   │   ├── main_test.go
-│   │   ├── Dockerfile
-│   │   └── .dockerignore
-│   └── unsafe/
-│       ├── go.mod
-│       ├── go.sum
-│       └── main.go
-└── docs/
-    └── README.md
-```
-
-The `assets` directory is reserved for project visual materials, including the `DevSecOps.png` logo referenced at the top of this README. The `frontend` directory contains the interactive pipeline dashboard used for presentation. The `backend` directory contains two Go service variants: `safe` for the successful pipeline path and `unsafe` for the SAST blocking scenario. The `docs` directory contains supporting documentation for architecture, pipeline design, security decisions, demonstration scenarios, and results.
-
-<h2 align="center">Team Roles</h2>
-
-The project responsibilities are distributed across the team according to the main architectural areas of the repository.
+## Team Roles
 
 | Team member | Responsibility |
 | --- | --- |
-| Ernest Kudakaev | Documentation and CI/CD pipeline design |
-| Zakhar Bolshakov | Backend development with Go/Golang |
-| Nikita Khripunkov | Backend development with Go/Golang |
-| Mariia Chegodaeva | Design and frontend development |
+| Ernest Kudakaev | Documentation, CI/CD pipeline, DevSecOps integration |
+| Zakhar Bolshakov | Backend development |
+| Nikita Khripunkov | Backend development |
+| Mariia Chegodaeva | Frontend and design |
 
-<h2 align="center">Technology Stack</h2>
+## DevSecOps Architecture
 
-The project design is based on the following technologies and security tools:
+```mermaid
+flowchart TD
+    Dev[Developer] --> Repo[GitHub Repository]
+    Repo --> Actions[GitHub Actions Pipeline]
 
-- GitHub Actions for CI/CD automation
-- Docker for application containerization
-- React 18 and Vite 5 for the frontend pipeline dashboard
-- Go/Golang for the backend application component
-- Semgrep or Bandit for Static Application Security Testing
-- Trivy for container image vulnerability scanning
-- ELK Stack or Wazuh for centralized logging and monitoring
+    Actions --> Tests[Go Tests + go vet]
+    Actions --> SAST[SAST Scanner: gosec]
+    Actions --> Build[Docker Build]
 
-These tools define the intended technical direction of the project foundation and are described as part of the secure pipeline design.
+    SAST --> SafeScan[Scan backend/safe]
+    SAST --> UnsafeScan[Scan backend/unsafe demo]
+    Build --> Trivy[Trivy Image Scan]
 
-<h2 align="center">Security Validation Stages</h2>
+    Tests --> Gate{Security Gate}
+    SafeScan --> Gate
+    Trivy --> Gate
+    UnsafeScan --> UnsafeGate{Unsafe Demo Gate}
 
-The pipeline design includes Static Application Security Testing to identify insecure source code patterns before delivery. It also includes dependency and container image vulnerability scanning to detect known security issues in application packages and container layers.
+    Gate -->|Pass| Deploy[Secure Container Flow]
+    Gate -->|Fail| Block[Pipeline Blocked]
+    UnsafeGate -->|Manual unsafe scenario| UnsafeBlock[Pipeline Fails for Demo]
+    UnsafeGate -->|Normal CI| Evidence[Findings Recorded]
 
-Security gates are intended to fail the delivery process when critical findings are detected. Security-related pipeline events, scan outcomes, and blocked delivery decisions can be recorded for analysis through centralized logging or monitoring.
+    Actions --> Reports[JSON Security Reports]
+    Reports --> ELK[ELK Logging Stack]
+    ELK --> Dashboard[Kibana Dashboard / Monitoring]
+```
 
-<h2 align="center">Demonstration Scenarios</h2>
+## Implemented Pipeline
 
-The project is designed to support three demonstration scenarios. In the first scenario, secure code passes the pipeline and reaches the delivery stage. In the second scenario, insecure source code is detected by SAST and blocked by the security gate. In the third scenario, a vulnerable container image is identified by Trivy and blocked before delivery.
+The DevSecOps workflow is defined in `.github/workflows/devsecops.yml` and runs on:
 
-<h2 align="center">Logging and Monitoring Concept</h2>
+- pushes to `main`
+- pull requests targeting `main`
+- manual `workflow_dispatch` runs
 
-Logging and monitoring provide visibility into security-relevant events across the pipeline. The project design can include records of source code scan results, container vulnerability scan results, failed security gates, and delivery decisions. A centralized logging or monitoring platform such as ELK Stack or Wazuh can be used to support auditability and analysis.
+Pipeline stages:
 
-<h2 align="center">Expected Outcome</h2>
+1. Checkout repository.
+2. Setup Go from the backend module version.
+3. Download Go module dependencies.
+4. Run tests for `backend/safe`.
+5. Run `go vet` for `backend/safe`.
+6. Run gosec SAST for `backend/safe` and `backend/unsafe`.
+7. Build the `backend/safe` Docker image.
+8. Scan the image with Trivy.
+9. Apply security gates.
+10. Upload JSON security reports as GitHub Actions artifacts.
 
-The expected outcome is a proof-of-concept DevSecOps pipeline foundation that demonstrates automated security checks and delivery blocking for insecure changes. The repository separates application areas and documentation so the project can clearly present the relationship between application code, containerization, CI/CD automation, security validation, and monitoring.
+## Security Gates
+
+The safe delivery path fails if:
+
+- `go test` fails
+- `go vet` reports problems
+- gosec reports findings in `backend/safe`
+- Trivy finds HIGH or CRITICAL vulnerabilities in the safe backend image
+
+The unsafe demo path is handled separately. `backend/unsafe` is always scanned so the findings appear in logs and artifacts. On normal push and pull request runs, those findings are recorded for education without breaking the safe delivery path. On a manual `workflow_dispatch` run with `scenario=unsafe` or `scenario=all`, the unsafe gate intentionally fails to demonstrate how vulnerable code is blocked.
+
+## Monitoring
+
+The repository includes a lightweight ELK monitoring setup in `docker-compose.monitoring.yml`. It mounts the local `reports/` directory, reads JSON scan outputs through Logstash, stores them in Elasticsearch, and exposes Kibana for dashboard review.
+
+Start the monitoring stack locally:
+
+```bash
+docker compose -f docker-compose.monitoring.yml up
+```
+
+After scan reports exist in `reports/`, open Kibana at:
+
+```text
+http://localhost:5601
+```
+
+## Repository Structure
+
+```text
+.
+|-- .github/workflows/devsecops.yml
+|-- README.md
+|-- docker-compose.monitoring.yml
+|-- assets/
+|-- backend/
+|   |-- safe/
+|   |-- unsafe/
+|   `-- README.md
+|-- docs/
+|   `-- README.md
+|-- frontend/
+`-- monitoring/logstash/pipeline/devsecops-reports.conf
+```
+
+## Demonstration Scenarios
+
+Safe scenario:
+
+- push or open a pull request to `main`
+- the safe backend passes tests, vet, SAST, Docker build, and Trivy scan
+- reports are uploaded as artifacts
+
+Unsafe scenario:
+
+- manually run the workflow from GitHub Actions
+- choose `scenario=unsafe` or `scenario=all`
+- gosec scans `backend/unsafe`
+- the workflow prints findings and intentionally fails the unsafe security gate
+
+This gives clear evidence of CI/CD automation, vulnerability detection, secure container scanning, security gates, and monitoring integration.
