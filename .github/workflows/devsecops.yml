@@ -72,7 +72,7 @@ jobs:
         run: docker build --pull -t devsecops-safe-backend:${{ github.sha }} backend/safe
 
       - name: Run Trivy image scan and save JSON report
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           image-ref: devsecops-safe-backend:${{ github.sha }}
           format: json
@@ -83,7 +83,7 @@ jobs:
           exit-code: "0"
 
       - name: Show HIGH and CRITICAL image findings in logs
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           image-ref: devsecops-safe-backend:${{ github.sha }}
           format: table
@@ -93,7 +93,7 @@ jobs:
           exit-code: "0"
 
       - name: Apply Trivy image security gate
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           image-ref: devsecops-safe-backend:${{ github.sha }}
           format: table
