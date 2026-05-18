@@ -82,6 +82,35 @@ The safe delivery path fails if:
 
 The unsafe demo path is handled separately. `backend/unsafe` is always scanned so the findings appear in logs and artifacts. On normal push and pull request runs, those findings are recorded for education without breaking the safe delivery path. On a manual `workflow_dispatch` run with `scenario=unsafe` or `scenario=all`, the unsafe gate intentionally fails to demonstrate how vulnerable code is blocked.
 
+## Application Docker Compose
+
+Start the frontend together with the safe backend:
+
+```bash
+docker compose up --build
+```
+
+The services are exposed locally:
+
+```text
+Frontend: http://localhost:3000
+Backend:  http://localhost:18080
+```
+
+The frontend Docker image proxies `/backend/*` requests to the safe backend container, so the live backend panel works from the composed stack.
+
+Override host ports if needed:
+
+```bash
+FRONTEND_PORT=3001 BACKEND_PORT=8080 docker compose up --build
+```
+
+Stop the application stack:
+
+```bash
+docker compose down
+```
+
 ## Monitoring
 
 The repository includes a lightweight ELK monitoring setup in `docker-compose.monitoring.yml`. It mounts the local `reports/` directory, reads JSON scan outputs through Logstash, stores them in Elasticsearch, and exposes Kibana for dashboard review.
