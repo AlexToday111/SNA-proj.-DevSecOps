@@ -1,8 +1,8 @@
-# Project Documentation
+<h1 align="center">Project Documentation</h1>
 
 This document explains Ernest's DevSecOps contribution to the project: CI/CD automation, security scanning, security gates, monitoring integration, and presentation guidance.
 
-## Project Purpose
+<h2 align="center">Project Purpose</h2>
 
 The project demonstrates a secure delivery workflow for a small containerized application. The goal is not to build a production platform, but to show how a team can integrate security checks into normal development instead of treating security as a separate final step.
 
@@ -11,7 +11,7 @@ The repository contains two backend examples:
 - `backend/safe`: secure Go service used for the successful pipeline.
 - `backend/unsafe`: intentionally vulnerable Go service used only for security demonstration.
 
-## DevSecOps Explanation
+<h2 align="center">DevSecOps Explanation</h2>
 
 DevSecOps means adding security controls into the same workflow that already builds, tests, and delivers software. In this project, GitHub Actions acts as the automation engine. Every relevant code change can run tests, static security analysis, container image scanning, and security gate logic before the application is considered safe to deliver.
 
@@ -22,7 +22,7 @@ The important idea for the presentation is simple:
 - serious findings should block delivery
 - reports should be stored for review and monitoring
 
-## CI/CD Pipeline Stages
+<h2 align="center">CI/CD Pipeline Stages</h2>
 
 The workflow file is located at:
 
@@ -51,7 +51,7 @@ Pipeline stages:
 11. Apply security gates.
 12. Upload JSON reports as GitHub Actions artifacts.
 
-## SAST With gosec
+<h2 align="center">SAST With gosec</h2>
 
 gosec is used for Static Application Security Testing because the backend is written in Go and gosec is easy to run in CI.
 
@@ -69,7 +69,7 @@ The unsafe backend intentionally includes insecure patterns such as:
 
 The unsafe scan is educational evidence. It proves that the security tool detects risky code patterns before they reach deployment.
 
-## Trivy Image Scanning
+<h2 align="center">Trivy Image Scanning</h2>
 
 Trivy scans the Docker image built from `backend/safe`.
 
@@ -77,7 +77,7 @@ The workflow exports a JSON report and also prints HIGH and CRITICAL findings in
 
 The safe backend Docker image uses a multi-stage build and a minimal final image, which reduces the number of operating system packages and therefore reduces the container attack surface.
 
-## Security Gate Logic
+<h2 align="center">Security Gate Logic</h2>
 
 The project has two clear gate paths.
 
@@ -96,7 +96,7 @@ Unsafe demonstration gate:
 
 This design keeps normal CI useful while still allowing a live failed-pipeline demonstration.
 
-## Reports and Artifacts
+<h2 align="center">Reports and Artifacts</h2>
 
 GitHub Actions uploads security reports as artifacts:
 
@@ -111,7 +111,7 @@ These files are suitable for:
 - importing into the monitoring stack
 - showing security gate decisions during presentation
 
-## ELK Monitoring Integration
+<h2 align="center">ELK Monitoring Integration</h2>
 
 The monitoring stack is defined in:
 
@@ -138,7 +138,7 @@ The pipeline labels reports by scanner type:
 
 This is a simplified local integration. In production, a team would normally send CI events and security findings to a centralized SIEM with authentication, retention policies, alerting, and access control.
 
-## How to Run Locally
+<h2 align="center">How to Run Locally</h2>
 
 Run safe backend checks:
 
@@ -182,7 +182,7 @@ Open Kibana:
 http://localhost:5601
 ```
 
-## How to Trigger GitHub Actions
+<h2 align="center">How to Trigger GitHub Actions</h2>
 
 Normal safe scenario:
 
@@ -201,7 +201,7 @@ Unsafe scenario:
 5. Start the run.
 6. Show that gosec detects the unsafe backend and the unsafe security gate fails intentionally.
 
-## Safe Demo Scenario
+<h2 align="center">Safe Demo Scenario</h2>
 
 Use this explanation during presentation:
 
@@ -215,7 +215,7 @@ Use this explanation during presentation:
 8. The security gate passes.
 9. Reports are uploaded as artifacts.
 
-## Unsafe Demo Scenario
+<h2 align="center">Unsafe Demo Scenario</h2>
 
 Use this explanation during presentation:
 
@@ -226,7 +226,7 @@ Use this explanation during presentation:
 5. The pipeline fails intentionally.
 6. The failed run proves that vulnerable code can be detected and blocked by CI/CD.
 
-## Presentation Talking Points
+<h2 align="center">Presentation Talking Points</h2>
 
 Recommended explanation order:
 
@@ -240,7 +240,7 @@ Recommended explanation order:
 8. Start the ELK stack locally and explain how reports are ingested.
 9. Connect the result to DevSecOps principles: shift-left security, automated gates, audit evidence, and monitoring.
 
-## Limitations and Simplifications
+<h2 align="center">Limitations and Simplifications</h2>
 
 This is a university demonstration, so several choices are intentionally simplified:
 

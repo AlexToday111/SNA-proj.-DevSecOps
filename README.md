@@ -2,7 +2,7 @@
   <img src="assets/DevSecOps.png" alt="DevSecOps project logo" width="180">
 </p>
 
-# Secure DevOps Pipeline for Containerized Application
+<h1 align="center">Secure DevOps Pipeline for Containerized Application</h1>
 
 This repository is a university DevSecOps project that demonstrates how security checks can be added directly to a CI/CD workflow for a containerized application. The project keeps two backend examples:
 
@@ -11,7 +11,7 @@ This repository is a university DevSecOps project that demonstrates how security
 
 The project is designed for a live presentation: a developer pushes code, GitHub Actions runs tests and security scans, reports are exported as artifacts, and the monitoring stack can ingest those reports for review in Kibana.
 
-## Team Roles
+<h2 align="center">Team Roles</h2>
 
 | Team member | Responsibility |
 | --- | --- |
@@ -20,7 +20,7 @@ The project is designed for a live presentation: a developer pushes code, GitHub
 | Nikita Khripunkov | Backend development |
 | Mariia Chegodaeva | Frontend and design |
 
-## DevSecOps Architecture
+<h2 align="center">DevSecOps Architecture</h2>
 
 ```mermaid
 flowchart TD
@@ -50,7 +50,7 @@ flowchart TD
     ELK --> Dashboard[Kibana Dashboard / Monitoring]
 ```
 
-## Implemented Pipeline
+<h2 align="center">Implemented Pipeline</h2>
 
 The DevSecOps workflow is defined in `.github/workflows/devsecops.yml` and runs on:
 
@@ -71,7 +71,7 @@ Pipeline stages:
 9. Apply security gates.
 10. Upload JSON security reports as GitHub Actions artifacts.
 
-## Security Gates
+<h2 align="center">Security Gates</h2>
 
 The safe delivery path fails if:
 
@@ -82,7 +82,7 @@ The safe delivery path fails if:
 
 The unsafe demo path is handled separately. `backend/unsafe` is always scanned so the findings appear in logs and artifacts. On normal push and pull request runs, those findings are recorded for education without breaking the safe delivery path. On a manual `workflow_dispatch` run with `scenario=unsafe` or `scenario=all`, the unsafe gate intentionally fails to demonstrate how vulnerable code is blocked.
 
-## Application Docker Compose
+<h2 align="center">Application Docker Compose</h2>
 
 Start the frontend together with the safe backend:
 
@@ -111,7 +111,7 @@ Stop the application stack:
 docker compose down
 ```
 
-## Monitoring
+<h2 align="center">Monitoring</h2>
 
 The repository includes a lightweight ELK monitoring setup in `docker-compose.monitoring.yml`. It mounts the local `reports/` directory, reads JSON scan outputs through Logstash, stores them in Elasticsearch, and exposes Kibana for dashboard review.
 
@@ -127,7 +127,7 @@ After scan reports exist in `reports/`, open Kibana at:
 http://localhost:5601
 ```
 
-## Repository Structure
+<h2 align="center">Repository Structure</h2>
 
 ```text
 .
@@ -145,7 +145,7 @@ http://localhost:5601
 `-- monitoring/logstash/pipeline/devsecops-reports.conf
 ```
 
-## Demonstration Scenarios
+<h2 align="center">Demonstration Scenarios</h2>
 
 Safe scenario:
 
